@@ -1,7 +1,6 @@
 # InsGen - Data-Efficient Instance Generation from Instance Discrimination
 
 ![image](./docs/assets/framework.png)
-**Figure:** *Training framework of InsGen.*
 
 > **Data-Efficient Instance Generation from Instance Discrimination** <br>
 > Ceyuan Yang, Yujun Shen, Yinghao Xu, Bolei Zhou <br>
