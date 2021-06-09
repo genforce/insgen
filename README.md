@@ -11,6 +11,11 @@
 
 In this work, we develop a novel data-efficient Instance Generation (**InsGen**) method for training GANs with limited data. With the instance discrimination as an auxiliary task, our method makes the best use of both real and fake images to train the discriminator. In turn the discriminator is exploited to train the generator to synthesize as many diverse images as possible. Experiments under different data regimes show that InsGen brings a substantial improvement over the baseline in terms of both image quality and image diversity, and outperforms previous data augmentation algorithms by a large margin.
 
+## Qualitative results
+Here we provide some synthesized samples with different numbers of training images and correspoding FID. Full codebase and weights are coming soon.
+![image](./docs/assets/main_results.jpg)
+![image](./docs/assets/limitations.jpg)
+
 ## BibTeX
 
 ```bibtex
