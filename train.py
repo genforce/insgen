@@ -69,6 +69,7 @@ def setup_training_loop_kwargs(
     rqs        = None,  # Size of real image queue: <int>, default = 5% * len(dataset)
     fqs        = None,  # Size of fake image queue: <int>, default = 5% * len(dataset)
     no_cl_on_g = False, # Disable fake instance discrimination for generator: <bool>, default = False
+    ada_linear = False, # Whether to linearly increase the strength of ADA: <bool>, default = False
 ):
     args = dnnlib.EasyDict()
 
@@ -386,6 +387,9 @@ def setup_training_loop_kwargs(
         if no_cl_on_g is not None:
             assert isinstance(no_cl_on_g, bool)
             args.no_cl_on_g = no_cl_on_g
+        if ada_linear is not None:
+            assert isinstance(ada_linear, bool)
+            args.ada_linear = ada_linear
         # Default loss weight for real instance discrimination, fake instance discrimination and fake instance discrimination on g
         args.cl_loss_weight = dnnlib.EasyDict(lw_real_cl=1.0, lw_fake_cl=1.0, lw_fake_cl_on_g=0.1)
     else:
@@ -476,6 +480,7 @@ class CommaSeparatedList(click.ParamType):
 @click.option('--rqs', help='Size of real image queue [default: 5% * len(dataset)]', type=int, metavar='INT')
 @click.option('--fqs', help='Size of fake image queue [default: 5% * len(dataset)]', type=int, metavar='INT')
 @click.option('--no_cl_on_g', help='Disable fake instance discrimination for generator [default: False]', type=bool, metavar='BOOL')
+@click.option('--ada_linear', help='Whether to linearly increase the strength of ADA [default: False]', type=bool, metavar='BOOL')
 
 
 def main(ctx, outdir, dry_run, **config_kwargs):

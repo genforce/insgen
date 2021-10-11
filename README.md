@@ -63,6 +63,7 @@ In this example, the results are saved to a created director `training_example`.
 - `--rqs` overrides the number of real image queue size. (default: 5% of the total number of training samples)
 - `--fqs` overrides the number of fake image queue size. More samples are beneficial, especially when the training samples are limited. (default: 5% of the total number of training samples)
 - `--gamma` overrides the R1 gamma (*i.e.*, gradient penalty). As described in [styleGAN2-ada-pytorch](https://github.com/NVlabs/stylegan2-ada-pytorch), training can be sensitive to this hyper-parameter. It would be better to try some different values. Here, we recommend using a smaller one than that in original StyleGAN2-ADA.
+- `--ada_linear` determines whether to linearly increase the strength of ADA. Here we recoomend using it when the number of training samples is less than 5k.
 
 More functions would be supported after this projest is merged into our [genforce](https://github.com/genforce/genforce). Please stay tuned!
 
