@@ -1,6 +1,6 @@
 # FakeCLR: Exploring Contrastive Learning for Solving Latent Discontinuity in Data-Efficient GANs
 
-![image](./docs/assets/framework.jpg)
+![image](./docs/assets/FakeCLR.pdf)
 
 > **FakeCLR: Exploring Contrastive Learning for Solving Latent Discontinuity in Data-Efficient GANs** <br>
 > Ziqiang Li, Chaoyue Wang, Heliang Zheng, Jing Zhang, and Bin Li <br>
@@ -11,7 +11,7 @@ In this paper, we revisit and compare different contrastive learning strategies 
 
 ## Qualitative results
 
-![image](./docs/assets/main_results.jpg)
+![image](./docs/assets/generated images.pdf)
 
 ## Training
 
