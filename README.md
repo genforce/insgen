@@ -1,11 +1,11 @@
 # FakeCLR: Exploring Contrastive Learning for Solving Latent Discontinuity in Data-Efficient GANs
 
-![image](./docs/assets/FakeCLR.pdf)
+![image](./docs/assets/FakeCLR.png)
 
 > **FakeCLR: Exploring Contrastive Learning for Solving Latent Discontinuity in Data-Efficient GANs** <br>
 > Ziqiang Li, Chaoyue Wang, Heliang Zheng, Jing Zhang, and Bin Li <br>
 
-[[Paper](https://arxiv.org/pdf/2207.08630.pdf)]
+[[Paper](https://arxiv.org/pdf/2207.08630.png)
 
 In this paper, we revisit and compare different contrastive learning strategies in DE-GANs, and identify (i) the current bottleneck of generative performance is the discontinuity of latent space; (ii) compared to other contrastive learning strategies, Instance-perturbation works towards latent space continuity, which brings the major improvement to DE-GANs. Based on these observations, we propose FakeCLR, which only applies contrastive learning on perturbed fake samples, and devises three related training techniques: Noise-related Latent Augmentation, Diversity-aware Queue, and Forgetting Factor of Queue. Our experimental results manifest the new state of the arts on both few-shot generation and limited-data generation. On multiple datasets, FakeCLR acquires more than 15% FID improvement compared to existing DE-GANs. 
 
