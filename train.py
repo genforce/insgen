@@ -64,9 +64,8 @@ def setup_training_loop_kwargs(
     allow_tf32 = None, # Allow PyTorch to use TF32 for matmul and convolutions: <bool>, default = False
     nobench    = None, # Disable cuDNN benchmarking: <bool>, default = False
     workers    = None, # Override number of DataLoader workers: <int>, default = 3
-    # InsGen related options
-    no_insgen  = False, # Disable insgen for training: <bool>, default = False
-    rqs        = None,  # Size of real image queue: <int>, default = 5% * len(dataset)
+    # FakeCLR related options
+    no_fakeclr  = False, # Disable fakeclr for training: <bool>, default = False
     fqs        = None,  # Size of fake image queue: <int>, default = 5% * len(dataset)
     no_cl_on_g = False, # Disable fake instance discrimination for generator: <bool>, default = False
     ada_linear = False, # Whether to linearly increase the strength of ADA: <bool>, default = False
@@ -364,24 +363,23 @@ def setup_training_loop_kwargs(
         args.data_loader_kwargs.num_workers = workers
 
     # ----------------------------------------------------
-    # InsGen: contrastive_head, no_cl_on_g, cl_loss_weight 
+    # fakeclr: contrastive_head, no_cl_on_g, cl_loss_weight 
     # ----------------------------------------------------
-    use_insgen = True
-    if no_insgen is not None:
-        assert isinstance(no_insgen, bool)
-        use_insgen = not no_insgen
+    use_fakeclr = True
+    if no_fakeclr is not None:
+        assert isinstance(no_fakeclr, bool)
+        use_fakeclr = not no_fakeclr
 
-    if use_insgen:
+    if use_fakeclr:
         # Overwrite class name of loss function
         args.loss_kwargs.class_name = 'training.contrastive_loss.StyleGAN2LossCL'
 
-        args.DHead_kwargs = dnnlib.EasyDict(class_name='training.contrastive_head.CLHead', inplanes=512, temperature=0.2, momentum=0.999, queue_size=-1)
-        args.GHead_kwargs = dnnlib.EasyDict(class_name='training.contrastive_head.CLHead', inplanes=512, temperature=0.2, momentum=0.999, queue_size=-1)
+        args.DHead_kwargs=None
+        args.GHead_kwargs = dnnlib.EasyDict(class_name='training.contrastive_head_iteration.CLHead', inplanes=512, temperature=0.2, momentum=0.999, queue_size=-1)
         # Default queue size is 0.05 * len(dataset)
         default_queue_size = int(0.05 * args.training_set_kwargs.max_size)
         if args.training_set_kwargs.xflip:
             default_queue_size *= 2
-        args.DHead_kwargs.queue_size = default_queue_size if rqs is None else rqs
         args.GHead_kwargs.queue_size = default_queue_size if fqs is None else fqs
 
         if no_cl_on_g is not None:
@@ -475,9 +473,8 @@ class CommaSeparatedList(click.ParamType):
 @click.option('--allow-tf32', help='Allow PyTorch to use TF32 internally', type=bool, metavar='BOOL')
 @click.option('--workers', help='Override number of DataLoader workers', type=int, metavar='INT')
 
-# InsGen related options.
-@click.option('--no_insgen', help='Disable InsGen back to ADA [default: False]', type=bool, metavar='BOOL')
-@click.option('--rqs', help='Size of real image queue [default: 5% * len(dataset)]', type=int, metavar='INT')
+# fakeclr related options.
+@click.option('--no_fakeclr', help='Disable FakeCLR back to ADA [default: False]', type=bool, metavar='BOOL')
 @click.option('--fqs', help='Size of fake image queue [default: 5% * len(dataset)]', type=int, metavar='INT')
 @click.option('--no_cl_on_g', help='Disable fake instance discrimination for generator [default: False]', type=bool, metavar='BOOL')
 @click.option('--ada_linear', help='Whether to linearly increase the strength of ADA [default: False]', type=bool, metavar='BOOL')

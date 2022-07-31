@@ -324,8 +324,10 @@ def training_loop(
             for round_idx, (real_img, real_c, gen_z, gen_c) in enumerate(zip(phase_real_img, phase_real_c, phase_gen_z, phase_gen_c)):
                 sync = (round_idx == batch_size // (batch_gpu * num_gpus) - 1)
                 gain = phase.interval
-                loss.accumulate_gradients(phase=phase.name, real_img=real_img, real_c=real_c, gen_z=gen_z, gen_c=gen_c, sync=sync, gain=gain, cl_phases=cl_phases, D_ema=D_ema, g_fake_cl=not no_cl_on_g, **cl_loss_weight)
-
+                label_size=real_img.shape[0]
+                label_idx=torch.ones(label_size, 1)*batch_idx
+    
+                loss.accumulate_gradients(phase=phase.name, real_img=real_img, real_c=real_c, gen_z=gen_z, gen_c=gen_c, sync=sync, gain=gain, batch_idx=label_idx,cl_phases=cl_phases, D_ema=D_ema, g_fake_cl=not no_cl_on_g, **cl_loss_weight)
             # Update weights.
             phase.module.requires_grad_(False)
             with torch.autograd.profiler.record_function(phase.name + '_opt'):

@@ -54,7 +54,8 @@ class StyleGAN2LossCL(Loss):
             logits = self.D(img, c)
         return logits
 
-    def run_cl(self, img, c, sync, contrastive_head, D_ema, loss_name='', loss_only=False, img1=None, update_q=False):
+
+    def run_cl(self, img, c, sync, contrastive_head, D_ema,batch_idx, loss_name='', loss_only=False, img1=None, update_q=False):
         # contrastive loss fwd 
 
         # augmentation first via ada-aug
@@ -68,11 +69,11 @@ class StyleGAN2LossCL(Loss):
             _, logits1 = D_ema(img1, c, return_feats=True)
 
         # project features into the unit sphere and calculate contrastive loss
-        loss = contrastive_head(logits0, logits1, loss_only=loss_only, update_q=update_q)
+        loss = contrastive_head(logits0, logits1,batch_idx=batch_idx, loss_only=loss_only, update_q=update_q)
         training_stats.report('Loss/'+loss_name, loss)
         return loss
 
-    def accumulate_gradients(self, phase, real_img, real_c, gen_z, gen_c, sync, gain, cl_phases=None, D_ema=None, lw_real_cl=1.0, lw_fake_cl=1.0, lw_fake_cl_on_g=1.0, g_fake_cl=False):
+    def accumulate_gradients(self, phase, real_img, real_c, gen_z, gen_c, sync, gain,batch_idx, cl_phases=None, D_ema=None, lw_real_cl=1.0, lw_fake_cl=1.0, lw_fake_cl_on_g=1.0, g_fake_cl=False):
         assert phase in ['Gmain', 'Greg', 'Gboth', 'Dmain', 'Dreg', 'Dboth']
         do_Gmain = (phase in ['Gmain', 'Gboth'])
         do_Dmain = (phase in ['Dmain', 'Dboth'])
@@ -95,7 +96,7 @@ class StyleGAN2LossCL(Loss):
                     Gphase = cl_phases['GHeadmain']
                     Gphase.module.requires_grad_(False)
                     # fake_cl on g: gradients bp to generator
-                    loss_Gmain = loss_Gmain + lw_fake_cl_on_g * self.run_cl(gen_img, gen_c, False, Gphase.module, D_ema, loss_name='G_cl_on_g', loss_only=True)
+                    loss_Gmain = loss_Gmain + lw_fake_cl_on_g * self.run_cl(gen_img, gen_c, False, Gphase.module, D_ema, batch_idx=batch_idx,loss_name='G_cl_on_g',loss_only=True)
 
             with torch.autograd.profiler.record_function('Gmain_backward'):
                 loss_Gmain.mean().mul(gain).backward()
@@ -161,9 +162,12 @@ class StyleGAN2LossCL(Loss):
                         Gphase.opt.zero_grad(set_to_none=True) 
                         # noisy perturbation
                         with torch.no_grad():
-                            delta_z = torch.randn(gen_z.shape, device=gen_z.device) * 0.15
+                            gen_z_mean=torch.abs(gen_z)
+                            gen_z_mean=torch.clamp(gen_z_mean, min=0, max=3)
+                            delta=gen_z_mean*0.1
+                            delta_z = torch.randn(gen_z.shape, device=gen_z.device) * delta
                             noisy_gen_img, _ = self.run_G(gen_z + delta_z, gen_c, sync=False)
-                        loss_Dreal = loss_Dreal + lw_fake_cl * self.run_cl(gen_img, gen_c, False, Gphase.module, D_ema, loss_name='G_cl', img1=noisy_gen_img, update_q=True)
+                        loss_Dreal = loss_Dreal + lw_fake_cl * self.run_cl(gen_img, gen_c, False,Gphase.module, D_ema,batch_idx=batch_idx, loss_name='G_cl', img1=noisy_gen_img, update_q=True)
 
                 loss_Dr1 = 0
                 if do_Dr1:
