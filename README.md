@@ -11,7 +11,7 @@ In this paper, we revisit and compare different contrastive learning strategies 
 
 ## Qualitative results
 
-![image](./docs/assets/generated images.png)
+![image](./docs/assets/generated_images.png)
 
 ## Training
 
